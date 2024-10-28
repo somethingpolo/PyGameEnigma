@@ -114,7 +114,11 @@ def find_lampboard_position(i):
 
 def get_rotor_positions():
     # Position rotors in the middle of the screen
-    return [(3 * WIDTH // 4 + WIDTH//5 - WIDTH//20, HEIGHT // 6 - 20), (WIDTH // 2 + WIDTH//5 - WIDTH//20, HEIGHT // 6 - 20), (WIDTH // 4 + WIDTH//5 - WIDTH//20, HEIGHT // 6 - 20)]
+    return [
+        (3 * WIDTH // 4 + WIDTH//5 - WIDTH//20, HEIGHT // 6 - 20), 
+        (WIDTH // 2 + WIDTH//5 - WIDTH//20, HEIGHT // 6 - 20), 
+        (WIDTH // 4 + WIDTH//5 - WIDTH//20, HEIGHT // 6 - 20)
+    ]
 
 
 def find_rotor_position(i, rotor_positions, rotor_output_positions):
@@ -271,10 +275,14 @@ while running:
             # Continuously draw while key is pressed
             draw_path_lines(positions, RED, 5)
 
+
+    # >>>>> Visuals >>>>>>>
+
     # Draw keyboard
     draw_keyboard(key_positions, screen)
 
     # Draw lampboard
+    # The return letter on the right
     for i in range(26):
         letter = list(string.ascii_uppercase)[i]
         y_offset = i * (font.get_height() + 4)
@@ -287,6 +295,7 @@ while running:
         screen.blit(label, label_rect)
 
     # Draw rotors (front-facing)
+    # The right side of the rotor
     for r, pos in enumerate(rotor_positions):
         # Display only the top few letters (simulate front-facing)
         for i in range(26):  # Show letters slightly above and below
@@ -300,6 +309,7 @@ while running:
             screen.blit(label, label_rect)
 
     # Draw rotor outputs (front-facing)
+    # The left side of the rotor
     for r, pos in enumerate(rotor_output_positions):
         for i in range(26):
             letter_index = (rotor_offsets[r] + i) % 26
