@@ -34,8 +34,18 @@ class Rotor:
     def rotateTowards(self):
         last = self.map.pop()
         self.map.insert(0, last)
+        for i in range(len(self.map)):
+            if self.map[i] == 25:
+                self.map[i] = 0
+            else:
+                self.map[i] += 1
 
     # rotaate up: away from viewer
     def rotateAway(self):
         first = self.map.pop(0)
         self.map.append(first)
+        for i in range(len(self.map)):
+            if self.map[i] == 0:
+                self.map[i] = 25
+            else:
+                self.map[i] -= 1
