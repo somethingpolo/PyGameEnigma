@@ -85,7 +85,7 @@ def get_scaled_font(size):
 
 
 def get_key_dimensions():
-    return WIDTH // 80, HEIGHT // 60  # key width, key height
+    return WIDTH // 40, HEIGHT // 30  # key width, key height
 
 
 def draw_arc(surface, color, rect, thickness):
@@ -96,7 +96,7 @@ def draw_arc(surface, color, rect, thickness):
 def get_key_positions():
     # Position keyboard keys along the bottom of the screen
     key_width, key_height = get_key_dimensions()
-    start_x = WIDTH // 5
+    start_x = WIDTH // 20
     margin_x = WIDTH // 100
     y_pos = HEIGHT - key_height - (HEIGHT // 30)
     return [(start_x + i * (key_width + margin_x), y_pos) for i in range(26)]
@@ -171,23 +171,17 @@ def make_path(i, j):
     lampboard = find_lampboard_position(i)
     positions.append(lampboard)
     rotors, i = find_rotor_position(i, rotor_positions, rotor_output_positions)
-    positions.append(rotors[0][0])
-    positions.append(rotors[0][1])
-    positions.append(rotors[1][0])
-    positions.append(rotors[1][1])
-    positions.append(rotors[2][0])
-    positions.append(rotors[2][1])
+    for a in range(3):
+        for b in range(2):
+            positions.append(rotors[a][b])
     reflector_pos, i = find_reflector_position(i, reflector)
     positions.append(reflector_pos[0])
     positions.append(reflector_pos[1])
     rotors_reversed, i = find_rotor_position_reversed(
         i, rotor_positions, rotor_output_positions)
-    positions.append(rotors_reversed[0][0])
-    positions.append(rotors_reversed[0][1])
-    positions.append(rotors_reversed[1][0])
-    positions.append(rotors_reversed[1][1])
-    positions.append(rotors_reversed[2][0])
-    positions.append(rotors_reversed[2][1])
+    for a in range(3):
+        for b in range(2):
+            positions.append(rotors_reversed[a][b])
     lampboard_end = find_lampboard_position(j)
     positions.append(lampboard_end)
     return positions
@@ -253,7 +247,7 @@ while running:
                 pressed_index = list(string.ascii_uppercase).index(pressed_key)
                 cipher_index = list(string.ascii_uppercase).index(cipher_key)
                 positions = make_path(pressed_index, cipher_index)
-                draw_path_lines(positions, RED, 5)
+                draw_path_lines(positions, RED, 4)
         elif event.type == pygame.KEYUP:
             # Update rotor positions (advance the first rotor, cascading if necessary)
             key_pressed = False
@@ -269,10 +263,10 @@ while running:
             pressed_index = list(string.ascii_uppercase).index(pressed_key)
             positions = make_path(pressed_index, cipher_index)
             # Continuously draw while key is pressed
-            draw_path_lines(positions, RED, 5)
+            draw_path_lines(positions, RED, 4)
 
     # Draw keyboard
-    draw_keyboard(key_positions, screen)
+    # draw_keyboard(key_positions, screen)
 
     # Draw lampboard
     for i in range(26):
@@ -280,7 +274,11 @@ while running:
         y_offset = i * (font.get_height() + 4)
 
         # Change color based on the light_up variable
-        color = BLUE if letter == cipher_key else BLACK
+        color = BLACK
+        if letter == cipher_key:
+            color = ORANGE
+        elif letter == pressed_key:
+            color = BLUE
         label = font.render(letter, True, color)
         label_rect = label.get_rect(
             center=(lamp_positions[0], lamp_positions[1] + y_offset))
@@ -319,11 +317,9 @@ while running:
             output_x = rotor_output_positions[r][0]
             output_y = rotor_output_positions[r][1] + \
                 rotorArray[r].map[i] * (font.get_height() + 4)
-            COLOR_ARRAY = [PURPLE, GREEN, ORANGE, RED]
-            indexHash = i % 4
-            LINE_COLOR = COLOR_ARRAY[indexHash]
-            pygame.draw.line(screen, LINE_COLOR,
-                             (input_x, input_y), (output_x, output_y), 1)
+
+            pygame.draw.line(screen, GRAY,
+                             (input_x, input_y), (output_x, output_y), 2)
 
     # Draw self lines for reflectors
     drawn = []
@@ -331,7 +327,7 @@ while running:
         letter = list(string.ascii_uppercase)[i]
         y_offset = i * (font.get_height() + 4)
 
-        color = RED if i == 0 else BLACK
+        color = BLACK
         label = font.render(letter, True, color)
         label_rect = label.get_rect(
             center=(reflector_positions[0], reflector_positions[1] + y_offset))
@@ -345,9 +341,6 @@ while running:
             target_rect = label.get_rect(
                 center=(reflector_positions[0], reflector_positions[1] + y_offset))
 
-            COLOR_ARRAY = [PURPLE, GREEN, ORANGE, RED]
-            indexHash = i % 4
-            LINE_COLOR = COLOR_ARRAY[indexHash]
             # Rect(left, top, width, height) -> Rect
             # draw_arc(surface, color, rect, thickness)
             radius = abs(label_rect.center[1]-target_rect.center[1])//2
@@ -358,7 +351,7 @@ while running:
             drawn.append(i)
             drawn.append(reflector.map[i])
 
-            draw_arc(screen, LINE_COLOR, temp_rect, 2)
+            draw_arc(screen, GRAY, temp_rect, 2)
     pygame.display.flip()
 
 pygame.quit()
