@@ -1,6 +1,0 @@
- positions.append(rotors[0][0])
-    positions.append(rotors[0][1])
-    positions.append(rotors[1][0])
-    positions.append(rotors[1][1])
-    positions.append(rotors[2][0])
-    positions.append(rotors[2][1])
