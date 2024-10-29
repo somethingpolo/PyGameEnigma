@@ -10,7 +10,7 @@
 1. The set of letters with thin lines connected are the rotors
 2. The alpha letters pressed will light up at the right (Blue)
 3. The return letter will light up on the right (Yellow)
-4. The path taken can be seen by the thick red line when you hold down the letter you want
+4. The path taken can be seen by the thick red line when you hold down the letter you want to encrypt / decrypt
 
 #### Lampboard
 - On the right
