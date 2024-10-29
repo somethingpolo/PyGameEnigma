@@ -2,15 +2,13 @@ import pygame
 from rotor import Rotor
 from reflector import Reflector
 import string
-import random
 import math
-
+import os
 slist = list(string.ascii_uppercase)
 
 
 def encode(plaintext, rArr, ref, counter):
     cIndexes = []
-    print(f"plaintext: {plaintext}")
     for c in range(len(plaintext.upper())):
         cIndexes.append(list(string.ascii_uppercase).index(plaintext[c]))
 
@@ -18,19 +16,17 @@ def encode(plaintext, rArr, ref, counter):
     for r in range(len(rArr)):
         for c in range(len(cIndexes)):
             cIndexes[c] = rArr[r].forward(cIndexes[c])
-            print(f"{slist[cIndexes[c]]}", end=" ")
-    print("\nforwards done")
+
     # reflector
     for c in range(len(cIndexes)):
         cIndexes[c] = ref.enter(cIndexes[c])
-        print(f"{slist[cIndexes[c]]}", end=" ")
-    print("\nreflector done")
+
     # backwards
     for r in range(len(rArr)-1, -1, -1):
         for c in range(len(cIndexes)):
             cIndexes[c] = rArr[r].backward(cIndexes[c])
-            print(f"{slist[cIndexes[c]]}", end=" ")
-    print("\nbackwards done")
+
+
 
     # convert from indexes to string
     outputStr = ""
@@ -60,7 +56,7 @@ keypressCounter = 0
 pygame.init()
 
 # Screen settings
-WIDTH, HEIGHT = 1920, 1080
+WIDTH, HEIGHT = 1366, 768
 screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
 pygame.display.set_caption("Scalable Enigma Machine Visualization")
 
@@ -77,6 +73,7 @@ ORANGE = (255, 165, 0)
 
 # Font (scaled based on screen size)
 
+pygame.font.init()
 
 def get_scaled_font(size):
     return pygame.font.Font(None, size)
@@ -195,11 +192,22 @@ def draw_path_lines(positions, color, thickness):
     for i in range(len(positions)):
         if i + 1 >= len(positions):
             break
+        
         curr_pos = positions[i]
         next_pos = positions[i+1]
+        if i == 7 :
+            rect = ((curr_pos[0]+next_pos[0])//2-abs(curr_pos[1]-next_pos[1])//2, 
+                    min(curr_pos[1], next_pos[1])-HEIGHT//400,
+                    abs(curr_pos[1]-next_pos[1]),
+                    abs(curr_pos[1]-next_pos[1])+HEIGHT//200)
+            draw_arc(screen, RED, rect,5)
+            continue
         pygame.draw.line(screen, color,
                          curr_pos, next_pos, thickness)
 
+def draw_shadow(surface, rect, color, offset=(3, 3)):
+    shadow_rect = rect.move(offset[0], offset[1])
+    pygame.draw.rect(surface, color, shadow_rect, border_radius=5)
 
 def draw_keyboard(key_positions, screen):
     for i, pos in enumerate(key_positions):
@@ -213,7 +221,7 @@ def draw_keyboard(key_positions, screen):
 
 letters = list(string.ascii_uppercase)
 
-# Initial rotor configurations and offsets
+# Initial rotor configurations and offsets``
 rotors = [list(letters), list(letters), list(letters)]
 rotor_offsets = [0, 0, 0]
 
@@ -290,6 +298,10 @@ while running:
         label = font.render(letter, True, color)
         label_rect = label.get_rect(
             center=(lamp_positions[0], lamp_positions[1] + y_offset))
+        if letter == cipher_key or letter == pressed_key:
+            rect = pygame.Rect(lamp_positions[0]-font.get_height()//2, lamp_positions[1] + y_offset-font.get_height()//2, font.get_height(), font.get_height())
+            pygame.draw.rect(screen, BLACK, rect)
+
         screen.blit(label, label_rect)
 
     # Draw rotors (front-facing)
