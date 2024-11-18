@@ -3,7 +3,7 @@
 
 ### How it works
 #### To decrypt
-1. Need to know reflector / plug board setting
+1. Need to know reflector / plug board setting (No plug board for this version)
 2. Need to know the rotor scramble + the initial rotation
 
 #### What you will see
@@ -26,6 +26,19 @@
 
 #### Reflector
 - The leftmost connector to reflect the signal back, mapping relationship is symmetrical between indexes
+- Does not allow the signal to be mapped to itself
+- Had fixed wirings for specific versions, cannot be changed
 
 #### Plugboard
 - This program is the basest form of the Enigma Machine and has yet to implement the plugboard
+- The plugboard is the initial signal switch, where for example A -> G, then the signal goes to the rotors
+
+### How was it broken
+- Weakness 1: A letter cannot be encrypted to itself, so a known text position can possibly be found in the cipher text
+- Weakness 2: For a rotor position A -> C means C -> A, this allows forming of loops
+
+#### Steps
+1. Have a known plaintext (partial or full)
+2. Find a crib, the place where the known plaintext could be
+3. Loop through different rotor positions and see if the plaintext can produce the ciphertext
+4. If a match is found, flag as a potential solution and get someone to check
