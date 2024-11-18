@@ -193,7 +193,14 @@ letters = list(string.ascii_uppercase)
 
 # Initial rotor configurations and offsets``
 rotors = [list(letters), list(letters), list(letters)]
-rotor_offsets = [0, 0, 0]
+rotor_offsets = [4, 0, 10]
+rotor1.setPosition(rotor_offsets[0])
+rotor2.setPosition(rotor_offsets[1])
+rotor3.setPosition(rotor_offsets[2])
+rotor1.rotorToString()
+rotor2.rotorToString()
+rotor3.rotorToString()
+
 
 # Variable to track the last key pressed
 pressed_key = None
