@@ -279,6 +279,8 @@ buttons = [rotor1away, rotor1towards, rotor2away,
 # Variable to track the last key pressed
 pressed_key = None
 cipher_key = None
+plaintext = ""
+ciphertext = ""
 key_pressed = False
 # Main loop
 running = True
@@ -298,6 +300,8 @@ while running:
     # Event handling
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            print(f"Plaintext: {plaintext}")
+            print(f"Ciphertext: {ciphertext}")
             running = False
         elif event.type == pygame.KEYDOWN:
             if event.unicode.upper() in letters:
@@ -305,6 +309,8 @@ while running:
                 pressed_key = event.unicode.upper()
                 cipher_key = encode(
                     pressed_key, rotorArray, reflector, keypressCounter)
+                plaintext += pressed_key
+                ciphertext += cipher_key
                 # draw used lines heavier
                 key_pressed = True
                 pressed_index = list(string.ascii_uppercase).index(pressed_key)
@@ -328,7 +334,7 @@ while running:
                 elif button.text == "towards":
                     button.rotor.rotateTowards()
                     rotor_offsets[button.index] -= 1
-                
+
                 # print current rotor setting
                 print("Current rotor setting: ", rotor_offsets)
 
