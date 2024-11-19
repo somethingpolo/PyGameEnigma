@@ -1,6 +1,6 @@
 from rotor import *
 from reflector import *
-
+from config import ROTAR_1_SEED, ROTAR_2_SEED, ROTAR_3_SEED, REFLECTOR_SEED
 
 def encode(plaintext, rArr, ref, counter):
     cIndexes = []
@@ -40,10 +40,10 @@ def rotateRotors(counter, rArr):
 class Bombe:
 
     def __init__(self) -> None:
-        self.rotor1 = Rotor(11, 1)
-        self.rotor2 = Rotor(22, 2)
-        self.rotor3 = Rotor(33, 3)
-        self.reflector = Reflector(44)
+        self.rotor1 = Rotor(ROTAR_1_SEED, 1)
+        self.rotor2 = Rotor(ROTAR_2_SEED, 2)
+        self.rotor3 = Rotor(ROTAR_3_SEED, 3)
+        self.reflector = Reflector(REFLECTOR_SEED)
         self.rotorArray = [self.rotor1, self.rotor2, self.rotor3]
 
         self.rotor_offsets = [0, 0, 0] # the current offsets

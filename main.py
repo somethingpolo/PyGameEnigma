@@ -4,6 +4,7 @@ from reflector import Reflector
 import string
 import math
 import os
+from config import INITIAL_ROTOR_OFFSET, ROTAR_1_SEED, ROTAR_2_SEED, ROTAR_3_SEED, REFLECTOR_SEED
 slist = list(string.ascii_uppercase)
 
 
@@ -44,10 +45,10 @@ def rotateRotors(counter, rArr):
 
 
 # Initialize Rotors & Reflector
-rotor1 = Rotor(11, 1)
-rotor2 = Rotor(22, 2)
-rotor3 = Rotor(33, 3)
-reflector = Reflector(44)
+rotor1 = Rotor(ROTAR_1_SEED, 1)
+rotor2 = Rotor(ROTAR_2_SEED, 2)
+rotor3 = Rotor(ROTAR_3_SEED, 3)
+reflector = Reflector(REFLECTOR_SEED)
 rotorArray = [rotor1, rotor2, rotor3]
 keypressCounter = 0
 
@@ -241,7 +242,7 @@ letters = list(string.ascii_uppercase)
 
 # Initial rotor configurations and offsets``
 rotors = [list(letters), list(letters), list(letters)]
-rotor_offsets = [4, 0, 10]
+rotor_offsets = INITIAL_ROTOR_OFFSET
 rotor1.setPosition(rotor_offsets[0])
 rotor2.setPosition(rotor_offsets[1])
 rotor3.setPosition(rotor_offsets[2])
