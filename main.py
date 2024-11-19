@@ -32,6 +32,7 @@ def encode(plaintext, rArr, ref, counter):
         outputStr += string.ascii_uppercase[c]
     return outputStr
 
+
 def rotateRotors(counter, rArr):
     counter += 1
     rArr[0].rotateAway()
@@ -40,6 +41,7 @@ def rotateRotors(counter, rArr):
     if counter % (26 * 26) == 0:
         rArr[2].rotateAway()
     return counter
+
 
 # Initialize Rotors & Reflector
 rotor1 = Rotor(11, 1)
@@ -61,6 +63,7 @@ pygame.display.set_caption("Scalable Enigma Machine Visualization")
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GRAY = (200, 200, 200)
+DARK_GRAY = (100, 100, 100)
 BLUE = (0, 128, 255)
 YELLOW = (255, 255, 0)
 RED = (255, 0, 0)  # Highlight color for "front-facing" letter
@@ -69,18 +72,50 @@ GREEN = (0, 128, 0)
 ORANGE = (255, 165, 0)
 
 # Font (scaled based on screen size)
-
 pygame.font.init()
+
+
+class Button:
+    def __init__(self, x, y, width, height, text, color, hover_color, text_color, rotor, index):
+        self.rect = pygame.Rect(x, y, width, height)
+        self.text = text
+        self.color = color
+        self.hover_color = hover_color
+        self.text_color = text_color
+        self.rotor = rotor
+        self.index = index
+
+    def draw(self, surface):
+        mouse_pos = pygame.mouse.get_pos()
+        is_hovered = self.rect.collidepoint(mouse_pos)
+        current_color = self.hover_color if is_hovered else self.color
+
+        pygame.draw.rect(surface, current_color, self.rect)
+        pygame.draw.rect(surface, BLACK, self.rect, 2)  # Border
+
+        text_surface = font.render(self.text, True, self.text_color)
+        text_rect = text_surface.get_rect(center=self.rect.center)
+        surface.blit(text_surface, text_rect)
+
+    def is_clicked(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left click
+            if self.rect.collidepoint(event.pos):
+                return True
+        return False
+
 
 def get_scaled_font(size):
     return pygame.font.Font(None, size)
 
+
 def get_key_dimensions():
     return WIDTH // 40, HEIGHT // 30  # key width, key height
+
 
 def draw_arc(surface, color, rect, thickness):
     pygame.draw.arc(surface, color, rect,
                     math.radians(90), math.radians(270), thickness)
+
 
 def get_key_positions():
     # Position keyboard keys along the bottom of the screen
@@ -89,6 +124,7 @@ def get_key_positions():
     margin_x = WIDTH // 100
     y_pos = HEIGHT - key_height - (HEIGHT // 30)
     return [(start_x + i * (key_width + margin_x), y_pos) for i in range(26)]
+
 
 def get_lampboard_positions():
     return (31*WIDTH // 32, HEIGHT // 6 - 20)
@@ -99,6 +135,7 @@ def find_lampboard_position(i):
     x = lamp_positions[0]
     return (x, y)
 
+
 def get_rotor_positions():
     # Position rotors in the middle of the screen
     return [
@@ -106,6 +143,7 @@ def get_rotor_positions():
         (WIDTH // 2 + WIDTH//5 - WIDTH//20, HEIGHT // 6 - 20),
         (WIDTH // 4 + WIDTH//5 - WIDTH//20, HEIGHT // 6 - 20)
     ]
+
 
 def find_rotor_position(i, rotor_positions, rotor_output_positions):
     locations = []
@@ -119,6 +157,7 @@ def find_rotor_position(i, rotor_positions, rotor_output_positions):
         locations.append(((input_x, input_y), (output_x, output_y)))
     return locations, i
 
+
 def find_rotor_position_reversed(i, rotor_positions, rotor_output_positions):
     locations = []
     for r in range(3-1, -1, -1):
@@ -131,14 +170,18 @@ def find_rotor_position_reversed(i, rotor_positions, rotor_output_positions):
         locations.append(((input_x, input_y), (output_x, output_y)))
     return locations, i
 
+
 def get_rotor_output_positions():
     return [(3 * WIDTH // 4 - WIDTH//20, HEIGHT // 6 - 20), (WIDTH // 2 - WIDTH//20, HEIGHT // 6 - 20), (WIDTH // 4 - WIDTH//20, HEIGHT // 6 - 20)]
+
 
 def get_rotor_radius():
     return min(WIDTH, HEIGHT) // 10
 
+
 def get_reflector_positions():
     return (WIDTH // 5 - WIDTH//20, HEIGHT // 6 - 20)
+
 
 def find_reflector_position(i, reflector):
     y = reflector_positions[1] + i * (font.get_height() + 4)
@@ -151,6 +194,8 @@ def find_reflector_position(i, reflector):
     return (input, output), i
 
 # collect the coordinates of the wiring connections that the signal travelled through
+
+
 def make_path(i, j):
     positions = []
     lampboard = find_lampboard_position(i)
@@ -172,22 +217,25 @@ def make_path(i, j):
     return positions
 
 # draw a path along make_path() above
+
+
 def draw_path_lines(positions, color, thickness):
     for i in range(len(positions)):
         if i + 1 >= len(positions):
             break
-        
+
         curr_pos = positions[i]
         next_pos = positions[i+1]
-        if i == 7 :
-            rect = ((curr_pos[0]+next_pos[0])//2-abs(curr_pos[1]-next_pos[1])//2, 
+        if i == 7:
+            rect = ((curr_pos[0]+next_pos[0])//2-abs(curr_pos[1]-next_pos[1])//2,
                     min(curr_pos[1], next_pos[1])-HEIGHT//400,
                     abs(curr_pos[1]-next_pos[1]),
                     abs(curr_pos[1]-next_pos[1])+HEIGHT//200)
-            draw_arc(screen, RED, rect,5)
+            draw_arc(screen, RED, rect, 5)
             continue
         pygame.draw.line(screen, color,
                          curr_pos, next_pos, thickness)
+
 
 letters = list(string.ascii_uppercase)
 
@@ -201,6 +249,31 @@ rotor1.rotorToString()
 rotor2.rotorToString()
 rotor3.rotorToString()
 
+# initialise rotor buttons
+rotor_positions = get_rotor_positions()
+rotor_output_positions = get_rotor_output_positions()
+button_positions = []
+button_bot_positions = []
+for i in range(len(rotor_positions)):
+    x = (rotor_positions[i][0] + rotor_output_positions[i][0])//2 - 30
+    y = rotor_positions[i][1] - 40
+    button_positions.append((x, y))
+    button_bot_positions.append((x, y+4*HEIGHT//5))
+rotor1away = Button(
+    button_positions[0][0], button_positions[0][1], 80, 20, "away", DARK_GRAY, RED, WHITE, rotor1, 0)
+rotor1towards = Button(
+    button_bot_positions[0][0], button_bot_positions[0][1], 80, 20, "towards", DARK_GRAY, RED, WHITE, rotor1, 0)
+rotor2away = Button(
+    button_positions[1][0], button_positions[1][1], 80, 20, "away", DARK_GRAY, RED, WHITE, rotor2, 1)
+rotor2towards = Button(
+    button_bot_positions[1][0], button_bot_positions[1][1], 80, 20, "towards", DARK_GRAY, RED, WHITE, rotor2, 1)
+rotor3away = Button(
+    button_positions[2][0], button_positions[2][1], 80, 20, "away", DARK_GRAY, RED, WHITE, rotor3, 2)
+rotor3towards = Button(
+    button_bot_positions[2][0], button_bot_positions[2][1], 80, 20, "towards", DARK_GRAY, RED, WHITE, rotor3, 2)
+
+buttons = [rotor1away, rotor1towards, rotor2away,
+           rotor2towards, rotor3away, rotor3towards]
 
 # Variable to track the last key pressed
 pressed_key = None
@@ -246,6 +319,16 @@ while running:
                 if rotor_offsets[1] == 0:
                     rotor_offsets[2] = (rotor_offsets[2] + 1) % 26
             keypressCounter = rotateRotors(keypressCounter, rotorArray)
+        for button in buttons:
+            if button.is_clicked(event):
+                if button.text == "away":
+                    button.rotor.rotateAway()
+                    rotor_offsets[button.index] += 1
+                elif button.text == "towards":
+                    button.rotor.rotateTowards()
+                    rotor_offsets[button.index] -= 1
+                else:
+                    continue
 
     if key_pressed:
         if pressed_key:  # Check if there was a key pressed
@@ -255,6 +338,9 @@ while running:
             draw_path_lines(positions, RED, 4)
 
     # >>>>> Visuals >>>>>>>
+
+    for button in buttons:
+        button.draw(screen)
 
     # Draw lampboard
     # The return letter on the right
@@ -272,7 +358,8 @@ while running:
         label_rect = label.get_rect(
             center=(lamp_positions[0], lamp_positions[1] + y_offset))
         if letter == cipher_key or letter == pressed_key:
-            rect = pygame.Rect(lamp_positions[0]-font.get_height()//2, lamp_positions[1] + y_offset-font.get_height()//2, font.get_height(), font.get_height())
+            rect = pygame.Rect(lamp_positions[0]-font.get_height()//2, lamp_positions[1] +
+                               y_offset-font.get_height()//2, font.get_height(), font.get_height())
             pygame.draw.rect(screen, BLACK, rect)
 
         screen.blit(label, label_rect)
