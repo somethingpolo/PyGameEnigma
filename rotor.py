@@ -5,22 +5,19 @@ import string
 
 class Rotor:
     def __init__(self, seed=-1, rotorNumber=None):
-        # set seed
-        if seed != -1:
-            random.seed(seed)
+        
+        self.seed = seed                # set seed
+        self.setPosition(0)             # set rotation
+        self.rotorNumber = rotorNumber  # set number
 
-        arr = list(range(26))
-        random.shuffle(arr)
-        self.map = arr
-        self.rotorNumber = rotorNumber
-        self.rotorToString()
+        # self.rotorToString() # print
 
-    # the forward path, where the key is pressed
+    # path through the rotors before signal reaches reflector
     def forward(self, inputIndex):
         outputIndex = self.map[inputIndex]  # get the value at the input
         return outputIndex
 
-    # return path to light up the return key
+    # path through the rotors after signal reaches reflector
     def backward(self, inputIndex):
         outputIndex = self.map.index(inputIndex)  # get index of the input
         return outputIndex
@@ -40,7 +37,7 @@ class Rotor:
             else:
                 self.map[i] += 1
 
-    # rotaate up: away from viewer
+    # rotate up: away from viewer
     def rotateAway(self):
         first = self.map.pop(0)
         self.map.append(first)
@@ -49,3 +46,18 @@ class Rotor:
                 self.map[i] = 25
             else:
                 self.map[i] -= 1
+
+    # to set the rotor position
+    def setPosition(self, pos):
+        pos = pos % 26
+
+        # set seed
+        if self.seed != -1:
+            random.seed(self.seed)
+
+        arr = list(range(26))
+        random.shuffle(arr)
+        self.map = arr
+
+        for _ in range(pos):
+            self.rotateAway()

@@ -2,15 +2,13 @@ import pygame
 from rotor import Rotor
 from reflector import Reflector
 import string
-import random
 import math
-
+import os
 slist = list(string.ascii_uppercase)
 
 
 def encode(plaintext, rArr, ref, counter):
     cIndexes = []
-    print(f"plaintext: {plaintext}")
     for c in range(len(plaintext.upper())):
         cIndexes.append(list(string.ascii_uppercase).index(plaintext[c]))
 
@@ -18,26 +16,21 @@ def encode(plaintext, rArr, ref, counter):
     for r in range(len(rArr)):
         for c in range(len(cIndexes)):
             cIndexes[c] = rArr[r].forward(cIndexes[c])
-            print(f"{slist[cIndexes[c]]}", end=" ")
-    print("\nforwards done")
+
     # reflector
     for c in range(len(cIndexes)):
         cIndexes[c] = ref.enter(cIndexes[c])
-        print(f"{slist[cIndexes[c]]}", end=" ")
-    print("\nreflector done")
+
     # backwards
     for r in range(len(rArr)-1, -1, -1):
         for c in range(len(cIndexes)):
             cIndexes[c] = rArr[r].backward(cIndexes[c])
-            print(f"{slist[cIndexes[c]]}", end=" ")
-    print("\nbackwards done")
 
     # convert from indexes to string
     outputStr = ""
     for c in cIndexes:
         outputStr += string.ascii_uppercase[c]
     return outputStr
-
 
 def rotateRotors(counter, rArr):
     counter += 1
@@ -48,7 +41,6 @@ def rotateRotors(counter, rArr):
         rArr[2].rotateAway()
     return counter
 
-
 # Initialize Rotors & Reflector
 rotor1 = Rotor(11, 1)
 rotor2 = Rotor(22, 2)
@@ -56,11 +48,12 @@ rotor3 = Rotor(33, 3)
 reflector = Reflector(44)
 rotorArray = [rotor1, rotor2, rotor3]
 keypressCounter = 0
+
 # Initialize Pygame
 pygame.init()
 
 # Screen settings
-WIDTH, HEIGHT = 1920, 1080
+WIDTH, HEIGHT = 1366, 768
 screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.RESIZABLE)
 pygame.display.set_caption("Scalable Enigma Machine Visualization")
 
@@ -77,21 +70,17 @@ ORANGE = (255, 165, 0)
 
 # Font (scaled based on screen size)
 
+pygame.font.init()
 
 def get_scaled_font(size):
     return pygame.font.Font(None, size)
 
-# Scaled positions and sizes
-
-
 def get_key_dimensions():
     return WIDTH // 40, HEIGHT // 30  # key width, key height
-
 
 def draw_arc(surface, color, rect, thickness):
     pygame.draw.arc(surface, color, rect,
                     math.radians(90), math.radians(270), thickness)
-
 
 def get_key_positions():
     # Position keyboard keys along the bottom of the screen
@@ -100,7 +89,6 @@ def get_key_positions():
     margin_x = WIDTH // 100
     y_pos = HEIGHT - key_height - (HEIGHT // 30)
     return [(start_x + i * (key_width + margin_x), y_pos) for i in range(26)]
-
 
 def get_lampboard_positions():
     return (31*WIDTH // 32, HEIGHT // 6 - 20)
@@ -111,7 +99,6 @@ def find_lampboard_position(i):
     x = lamp_positions[0]
     return (x, y)
 
-
 def get_rotor_positions():
     # Position rotors in the middle of the screen
     return [
@@ -119,7 +106,6 @@ def get_rotor_positions():
         (WIDTH // 2 + WIDTH//5 - WIDTH//20, HEIGHT // 6 - 20),
         (WIDTH // 4 + WIDTH//5 - WIDTH//20, HEIGHT // 6 - 20)
     ]
-
 
 def find_rotor_position(i, rotor_positions, rotor_output_positions):
     locations = []
@@ -133,7 +119,6 @@ def find_rotor_position(i, rotor_positions, rotor_output_positions):
         locations.append(((input_x, input_y), (output_x, output_y)))
     return locations, i
 
-
 def find_rotor_position_reversed(i, rotor_positions, rotor_output_positions):
     locations = []
     for r in range(3-1, -1, -1):
@@ -146,18 +131,14 @@ def find_rotor_position_reversed(i, rotor_positions, rotor_output_positions):
         locations.append(((input_x, input_y), (output_x, output_y)))
     return locations, i
 
-
 def get_rotor_output_positions():
     return [(3 * WIDTH // 4 - WIDTH//20, HEIGHT // 6 - 20), (WIDTH // 2 - WIDTH//20, HEIGHT // 6 - 20), (WIDTH // 4 - WIDTH//20, HEIGHT // 6 - 20)]
-
 
 def get_rotor_radius():
     return min(WIDTH, HEIGHT) // 10
 
-
 def get_reflector_positions():
     return (WIDTH // 5 - WIDTH//20, HEIGHT // 6 - 20)
-
 
 def find_reflector_position(i, reflector):
     y = reflector_positions[1] + i * (font.get_height() + 4)
@@ -169,7 +150,7 @@ def find_reflector_position(i, reflector):
     output = (x, y)
     return (input, output), i
 
-
+# collect the coordinates of the wiring connections that the signal travelled through
 def make_path(i, j):
     positions = []
     lampboard = find_lampboard_position(i)
@@ -190,32 +171,36 @@ def make_path(i, j):
     positions.append(lampboard_end)
     return positions
 
-
+# draw a path along make_path() above
 def draw_path_lines(positions, color, thickness):
     for i in range(len(positions)):
         if i + 1 >= len(positions):
             break
+        
         curr_pos = positions[i]
         next_pos = positions[i+1]
+        if i == 7 :
+            rect = ((curr_pos[0]+next_pos[0])//2-abs(curr_pos[1]-next_pos[1])//2, 
+                    min(curr_pos[1], next_pos[1])-HEIGHT//400,
+                    abs(curr_pos[1]-next_pos[1]),
+                    abs(curr_pos[1]-next_pos[1])+HEIGHT//200)
+            draw_arc(screen, RED, rect,5)
+            continue
         pygame.draw.line(screen, color,
                          curr_pos, next_pos, thickness)
 
-
-def draw_keyboard(key_positions, screen):
-    for i, pos in enumerate(key_positions):
-        color = BLUE if letters[i] == pressed_key else GRAY
-        pygame.draw.rect(screen, color, (*pos, key_width, key_height))
-        label = font.render(letters[i], True, BLACK)
-        label_rect = label.get_rect(
-            center=(pos[0] + key_width // 2, pos[1] + key_height // 2))
-        screen.blit(label, label_rect)
-
-
 letters = list(string.ascii_uppercase)
 
-# Initial rotor configurations and offsets
+# Initial rotor configurations and offsets``
 rotors = [list(letters), list(letters), list(letters)]
-rotor_offsets = [0, 0, 0]
+rotor_offsets = [4, 0, 10]
+rotor1.setPosition(rotor_offsets[0])
+rotor2.setPosition(rotor_offsets[1])
+rotor3.setPosition(rotor_offsets[2])
+rotor1.rotorToString()
+rotor2.rotorToString()
+rotor3.rotorToString()
+
 
 # Variable to track the last key pressed
 pressed_key = None
@@ -271,9 +256,6 @@ while running:
 
     # >>>>> Visuals >>>>>>>
 
-    # Draw keyboard
-    # draw_keyboard(key_positions, screen)
-
     # Draw lampboard
     # The return letter on the right
     for i in range(26):
@@ -289,6 +271,10 @@ while running:
         label = font.render(letter, True, color)
         label_rect = label.get_rect(
             center=(lamp_positions[0], lamp_positions[1] + y_offset))
+        if letter == cipher_key or letter == pressed_key:
+            rect = pygame.Rect(lamp_positions[0]-font.get_height()//2, lamp_positions[1] + y_offset-font.get_height()//2, font.get_height(), font.get_height())
+            pygame.draw.rect(screen, BLACK, rect)
+
         screen.blit(label, label_rect)
 
     # Draw rotors (front-facing)

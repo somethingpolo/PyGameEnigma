@@ -25,7 +25,7 @@ class Reflector:
                 self.map[target] = i
                 arr.pop(arr.index(target))
                 arr.pop(arr.index(i))
-        self.reflectorToString()
+        # self.reflectorToString()
 
     # reflect the signal
     def enter(self, inputIndex):
