@@ -328,8 +328,9 @@ while running:
                 elif button.text == "towards":
                     button.rotor.rotateTowards()
                     rotor_offsets[button.index] -= 1
-                else:
-                    continue
+                
+                # print current rotor setting
+                print("Current rotor setting: ", rotor_offsets)
 
     if key_pressed:
         if pressed_key:  # Check if there was a key pressed
