@@ -115,8 +115,8 @@ def find_lampboard_position(i):
 def get_rotor_positions():
     # Position rotors in the middle of the screen
     return [
-        (3 * WIDTH // 4 + WIDTH//5 - WIDTH//20, HEIGHT // 6 - 20), 
-        (WIDTH // 2 + WIDTH//5 - WIDTH//20, HEIGHT // 6 - 20), 
+        (3 * WIDTH // 4 + WIDTH//5 - WIDTH//20, HEIGHT // 6 - 20),
+        (WIDTH // 2 + WIDTH//5 - WIDTH//20, HEIGHT // 6 - 20),
         (WIDTH // 4 + WIDTH//5 - WIDTH//20, HEIGHT // 6 - 20)
     ]
 
@@ -268,7 +268,6 @@ while running:
             positions = make_path(pressed_index, cipher_index)
             # Continuously draw while key is pressed
             draw_path_lines(positions, RED, 4)
-
 
     # >>>>> Visuals >>>>>>>
 

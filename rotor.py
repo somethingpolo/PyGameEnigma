@@ -17,12 +17,12 @@ class Rotor:
 
     # the forward path, where the key is pressed
     def forward(self, inputIndex):
-        outputIndex = self.map[inputIndex]  # get the value at the input 
+        outputIndex = self.map[inputIndex]  # get the value at the input
         return outputIndex
 
     # return path to light up the return key
     def backward(self, inputIndex):
-        outputIndex = self.map.index(inputIndex) # get index of the input
+        outputIndex = self.map.index(inputIndex)  # get index of the input
         return outputIndex
 
     # prints the rotors mapping
